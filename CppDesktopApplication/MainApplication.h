@@ -1,6 +1,10 @@
 #pragma once
 #include <Windows.h>
+
 struct StateInfo {  };
+BOOL WindowResize(HWND hwnd, WPARAM wParam, LPARAM lParam);
+HWND hwndSignIn;
+HWND hwndLogin;
 
 inline StateInfo* GetAppState(HWND hwnd)
 {

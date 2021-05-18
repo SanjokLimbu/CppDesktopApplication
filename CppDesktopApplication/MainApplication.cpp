@@ -22,7 +22,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		return 0;
 	}
 
-	//Create Window
+	//Create main Window
 	HWND hwnd = CreateWindowEx(
 		0,
 		CLASS_NAME,
@@ -65,14 +65,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 	{
 		pState = GetAppState(hwnd);
 	}
-
-	RECT windowRect;
-	if (!GetWindowRect(GetDesktopWindow(), &windowRect))
-		return FALSE;
-
-	int posX = windowRect.right - 100;
-	int posY = windowRect.bottom - 100;
-
+	
 	switch (uMsg)
 	{
 		case WM_DESTROY:
@@ -80,9 +73,13 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 			return 0;
 			break;
 
+		case WM_SIZE:
+			WindowResize(hwnd, wParam, lParam);
+			break;
+
 		case WM_CREATE: 
-			CreateWindow(TEXT("BUTTON"), TEXT("Sign In"), WS_VISIBLE | WS_CHILD, posX, posY, 100, 50, hwnd, (HMENU)1, NULL, NULL);
-			CreateWindow(TEXT("BUTTON"), TEXT("Login"), WS_VISIBLE | WS_CHILD, 350, 200, 100, 50, hwnd, (HMENU)2, NULL, NULL);
+			hwndSignIn = CreateWindow(TEXT("BUTTON"), TEXT("Sign In"), WS_VISIBLE | WS_CHILD, CW_USEDEFAULT, CW_USEDEFAULT, 100, 50, hwnd, (HMENU)1, NULL, NULL);
+			hwndLogin = CreateWindow(TEXT("BUTTON"), TEXT("Login"), WS_VISIBLE | WS_CHILD, 350, 200, 100, 50, hwnd, (HMENU)2, NULL, NULL);
 			break;
 
 		case WM_PAINT: 
@@ -94,4 +91,34 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 			return 0;
 	}
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
+}
+
+BOOL WindowResize(HWND hwnd, WPARAM wParam, LPARAM lParam)
+{
+	int width = LOWORD(lParam);
+	int height = HIWORD(lParam);
+
+	RECT windowRect;
+	//Initialize child window button
+	RECT childRect{};
+	childRect.left = 0;
+	childRect.top = 0;
+	childRect.right = 100;
+	childRect.bottom = 50;
+
+	GetWindowRect(hwnd, &windowRect);
+	//Calculate center co ordinate of window and set button
+
+	int parentWidth = windowRect.right - windowRect.left;
+	int parentHeight = windowRect.bottom - windowRect.top;
+
+	int childWidth = childRect.right - childRect.left;
+	int childHeight = childRect.bottom - childRect.top;
+
+	int button_x = (parentWidth / 2) - (childWidth / 2);
+	int button_y = (parentHeight / 2) - (childHeight / 2);
+
+	SetWindowPos(hwndSignIn, NULL, button_x - 50, button_y, 100, 50, SWP_NOZORDER);
+	SetWindowPos(hwndLogin, NULL, button_x + 50, button_y, 100, 50, SWP_NOZORDER);
+	return true;
 }

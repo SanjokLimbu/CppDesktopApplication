@@ -140,9 +140,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="MainApplication.cpp" />
+    <ClCompile Include="PopupWIndow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainApplication.h" />
+    <ClInclude Include="PopupWIndow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

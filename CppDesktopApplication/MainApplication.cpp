@@ -13,6 +13,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	wc.lpfnWndProc = WindowProc;
 	wc.lpszClassName = CLASS_NAME;
 	wc.hInstance = hInstance;
+	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 
 	RegisterClass(&wc);
 	//Manage application state
@@ -78,8 +79,14 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 			break;
 
 		case WM_CREATE: 
-			hwndSignIn = CreateWindow(TEXT("BUTTON"), TEXT("Sign In"), WS_VISIBLE | WS_CHILD, CW_USEDEFAULT, CW_USEDEFAULT, 100, 50, hwnd, (HMENU)1, NULL, NULL);
-			hwndLogin = CreateWindow(TEXT("BUTTON"), TEXT("Login"), WS_VISIBLE | WS_CHILD, 350, 200, 100, 50, hwnd, (HMENU)2, NULL, NULL);
+			hwndSignIn = CreateWindow(TEXT("BUTTON"), TEXT("Sign In"), WS_VISIBLE | WS_CHILD, CW_USEDEFAULT, CW_USEDEFAULT, 100, 50, hwnd, (HMENU)SIGN_IN_WINDOW, NULL, NULL);
+			hwndLogin = CreateWindow(TEXT("BUTTON"), TEXT("Login"), WS_VISIBLE | WS_CHILD, CW_USEDEFAULT, CW_USEDEFAULT, 100, 50, hwnd, (HMENU)LOGIN_IN_WINDOW, NULL, NULL);
+			break;
+
+		case WM_COMMAND:
+			if (LOWORD(wParam) == SIGN_IN_WINDOW) {
+				signInBox = CreateWindow(TEXT("BUTTON"), TEXT("Enter Your Details"), WS_VISIBLE | WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 100, 50, hwnd, (HMENU)SIGN_IN_BOX, NULL, NULL);
+			}
 			break;
 
 		case WM_PAINT: 

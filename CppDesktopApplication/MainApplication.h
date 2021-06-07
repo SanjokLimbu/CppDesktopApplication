@@ -1,10 +1,13 @@
-#pragma once
+#define SIGN_IN_WINDOW 100
+#define LOGIN_IN_WINDOW 101
+#define SIGN_IN_BOX 102
 #include <Windows.h>
 
 struct StateInfo {  };
 BOOL WindowResize(HWND hwnd, WPARAM wParam, LPARAM lParam);
 HWND hwndSignIn;
 HWND hwndLogin;
+HWND signInBox;
 
 inline StateInfo* GetAppState(HWND hwnd)
 {

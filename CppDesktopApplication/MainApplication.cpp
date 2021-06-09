@@ -1,4 +1,5 @@
 #include "MainApplication.h"
+#include "PopupWindow.h"
 #include <windows.h>
 #include <new>
 
@@ -8,7 +9,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	//Register Window class
 	CONST wchar_t CLASS_NAME[] = L"CppDesktopApplication";
 
-	WNDCLASS wc = {};
+	WNDCLASS wc = {0};
 
 	wc.lpfnWndProc = WindowProc;
 	wc.lpszClassName = CLASS_NAME;
@@ -16,6 +17,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 
 	RegisterClass(&wc);
+	registerDialog(hInstance);
 	//Manage application state
 	StateInfo* pstate = new (std::nothrow) StateInfo;
 
@@ -41,6 +43,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	}
 
 	ShowWindow(hwnd, nCmdShow);
+	UpdateWindow(hwnd);
 
 	//Run message loop
 	MSG msg = {};
@@ -79,13 +82,16 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 			break;
 
 		case WM_CREATE: 
-			hwndSignIn = CreateWindow(TEXT("BUTTON"), TEXT("Sign In"), WS_VISIBLE | WS_CHILD, CW_USEDEFAULT, CW_USEDEFAULT, 100, 50, hwnd, (HMENU)SIGN_IN_WINDOW, NULL, NULL);
+			hwndRegister = CreateWindow(TEXT("BUTTON"), TEXT("Register"), WS_VISIBLE | WS_CHILD, CW_USEDEFAULT, CW_USEDEFAULT, 100, 50, hwnd, (HMENU)REGISTER_WINDOW, NULL, NULL);
 			hwndLogin = CreateWindow(TEXT("BUTTON"), TEXT("Login"), WS_VISIBLE | WS_CHILD, CW_USEDEFAULT, CW_USEDEFAULT, 100, 50, hwnd, (HMENU)LOGIN_IN_WINDOW, NULL, NULL);
 			break;
 
 		case WM_COMMAND:
-			if (LOWORD(wParam) == SIGN_IN_WINDOW) {
-				signInBox = CreateWindow(TEXT("BUTTON"), TEXT("Enter Your Details"), WS_VISIBLE | WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 100, 50, hwnd, (HMENU)SIGN_IN_BOX, NULL, NULL);
+			switch (wParam) 
+			{
+				case REGISTER_WINDOW:
+					displayRegisterDialog(hwndRegister);
+					break;
 			}
 			break;
 
@@ -125,7 +131,7 @@ BOOL WindowResize(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	int button_x = (parentWidth / 2) - (childWidth / 2);
 	int button_y = (parentHeight / 2) - (childHeight / 2);
 
-	SetWindowPos(hwndSignIn, NULL, button_x - 50, button_y, 100, 50, SWP_NOZORDER);
+	SetWindowPos(hwndRegister, NULL, button_x - 50, button_y, 100, 50, SWP_NOZORDER);
 	SetWindowPos(hwndLogin, NULL, button_x + 50, button_y, 100, 50, SWP_NOZORDER);
 	return true;
 }

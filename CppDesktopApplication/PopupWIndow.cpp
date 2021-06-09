@@ -1,11 +1,34 @@
-#include "PopupWIndow.h"
+#include "PopupWindow.h"
+#include <Windows.h>
 
-const WORD ID_textAreaUserName = 1;
-const WORD ID_textAreaPassWord = 2;
-const WORD ID_btnEnter = 3;
+LRESULT CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-const SizeAndPost_t window = { 150, 150, 300, 300 };
-const SizeAndPost_t textAreaUserName = { 20, 50, 150, 20 };
-const SizeAndPost_t textAreaPassWord = { 20, 90, 150, 20 };
-const SizeAndPost_t btnEnter = { 20, 150, 150, 20 };
+void registerDialog(HINSTANCE hInstance) 
+{
+	WNDCLASS dialogBox = {0};
 
+	dialogBox.lpfnWndProc = DialogProc;
+	dialogBox.lpszClassName = L"dialogClass";
+	dialogBox.hInstance = hInstance;
+	dialogBox.hCursor = LoadCursor(NULL, IDC_ARROW);
+
+	RegisterClass(&dialogBox);
+}
+
+void displayRegisterDialog(HWND hwnd) 
+{
+	CreateWindow(TEXT("dialogClass"), TEXT("Register"), WS_VISIBLE | WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 200, 200, hwnd, NULL, NULL, NULL);
+}
+
+LRESULT DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
+	{
+		case WM_CLOSE:
+			PostQuitMessage(0);
+			break;
+		default:
+			return 0;
+			break;
+	}
+}

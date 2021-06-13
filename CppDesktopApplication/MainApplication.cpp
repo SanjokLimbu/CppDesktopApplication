@@ -1,6 +1,4 @@
 #include "MainApplication.h"
-#include "PopupWindow.h"
-#include <windows.h>
 #include <new>
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -9,7 +7,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	//Register Window class
 	CONST wchar_t CLASS_NAME[] = L"CppDesktopApplication";
 
-	WNDCLASS wc = {0};
+	WNDCLASS wc = {};
 
 	wc.lpfnWndProc = WindowProc;
 	wc.lpszClassName = CLASS_NAME;
@@ -17,7 +15,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 
 	RegisterClass(&wc);
-	registerDialog(hInstance);
+
+	//Pass instance of main window to dialog window instance
+	RegisterDialog(hInstance);
+
 	//Manage application state
 	StateInfo* pstate = new (std::nothrow) StateInfo;
 
@@ -26,7 +27,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	}
 
 	//Create main Window
-	HWND hwnd = CreateWindowEx(
+	hwndMainWindow = CreateWindowEx(
 		0,
 		CLASS_NAME,
 		L"DesktopApplication",
@@ -38,12 +39,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		pstate
 	);
 
-	if (hwnd == NULL) {
+	if (hwndMainWindow == NULL) {
 		return 0;
 	}
 
-	ShowWindow(hwnd, nCmdShow);
-	UpdateWindow(hwnd);
+	ShowWindow(hwndMainWindow, nCmdShow);
+	UpdateWindow(hwndMainWindow);
 
 	//Run message loop
 	MSG msg = {};
@@ -74,7 +75,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 	{
 		case WM_DESTROY:
 			PostQuitMessage(0);
-			return 0;
 			break;
 
 		case WM_SIZE:
@@ -87,10 +87,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 			break;
 
 		case WM_COMMAND:
-			switch (wParam) 
+			switch (LOWORD(wParam)) 
 			{
 				case REGISTER_WINDOW:
-					displayRegisterDialog(hwndRegister);
+					DisplayRegisterDialog(hwnd);
+					EnableWindow(hwnd, false);
 					break;
 			}
 			break;

@@ -73,7 +73,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 	
 	switch (uMsg)
 	{
-		case WM_DESTROY:
+		case WM_CLOSE:
 			PostQuitMessage(0);
 			break;
 
@@ -82,12 +82,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 			break;
 
 		case WM_CREATE: 
-			hwndRegister = CreateWindow(TEXT("BUTTON"), TEXT("Register"), WS_VISIBLE | WS_CHILD, CW_USEDEFAULT, CW_USEDEFAULT, 100, 50, hwnd, (HMENU)REGISTER_WINDOW, NULL, NULL);
-			hwndLogin = CreateWindow(TEXT("BUTTON"), TEXT("Login"), WS_VISIBLE | WS_CHILD, CW_USEDEFAULT, CW_USEDEFAULT, 100, 50, hwnd, (HMENU)LOGIN_IN_WINDOW, NULL, NULL);
+			hwndRegister = CreateWindowW(TEXT("BUTTON"), TEXT("Register"), WS_VISIBLE | WS_CHILD, CW_USEDEFAULT, CW_USEDEFAULT, 100, 50, hwnd, (HMENU)REGISTER_WINDOW, NULL, NULL);
+			hwndLogin = CreateWindowW(TEXT("BUTTON"), TEXT("Login"), WS_VISIBLE | WS_CHILD, CW_USEDEFAULT, CW_USEDEFAULT, 100, 50, hwnd, (HMENU)LOGIN_IN_WINDOW, NULL, NULL);
 			break;
 
 		case WM_COMMAND:
-			switch (LOWORD(wParam)) 
+			switch (LOWORD(wParam))
 			{
 				case REGISTER_WINDOW:
 					DisplayRegisterDialog(hwnd);

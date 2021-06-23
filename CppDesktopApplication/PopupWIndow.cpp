@@ -1,9 +1,10 @@
 #include "PopupWindow.h"
+#include "SQLConnection.h"
 
 LRESULT CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 CONST wchar_t DIALOG_WINDOW_NAME[] = L"DialogClass";
 
-HWND hwndDialogWindow;
+HWND hwndMainWindowInstance, hwndUserNameEntry, hwndPasswordEntry, hwndSubmit;
 
 //Create instance of main window to use as dialog window
 void RegisterDialog(HINSTANCE hInstance)
@@ -23,7 +24,8 @@ void RegisterDialog(HINSTANCE hInstance)
 
 void DisplayRegisterDialog(HWND hwnd) 
 {
-	hwndDialogWindow = CreateWindow(DIALOG_WINDOW_NAME, L"Register User", WS_VISIBLE | WS_OVERLAPPED | WS_SYSMENU | WS_CAPTION, CW_USEDEFAULT, CW_USEDEFAULT, 400, 400, hwnd, NULL, NULL, NULL);
+	hwndMainWindowInstance = hwnd;
+	HWND hwndDialogWindow = CreateWindowW(DIALOG_WINDOW_NAME, L"Register User", WS_VISIBLE | WS_OVERLAPPED | WS_SYSMENU | WS_CAPTION, CW_USEDEFAULT, CW_USEDEFAULT, 400, 400, hwnd, NULL, NULL, NULL);
 	if (hwndDialogWindow == NULL) {
 		int rresult = GetLastError();
 		MessageBox(NULL, L"Dialog window creation failed", L"Error", 0);
@@ -50,22 +52,33 @@ LRESULT CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg)
 	{
 		case WM_CLOSE:
-			if (hwndDialogWindow) {
-				SendMessage(hwndDialogWindow, WM_CLOSE, 0, NULL);
-				//EnableWindow(hwnd, true);
-			}
+			DestroyWindow(hwnd);
+			EnableWindow(hwndMainWindowInstance, true);
 			break;
 		case WM_CREATE:
-			HWND hwndUserNameText = CreateWindow(L"static", L"Username", WS_CHILD | WS_VISIBLE, 50, 25, 100, 25, hwnd, NULL, NULL, NULL);
-			HWND hwndUserNameEntry = CreateWindow(L"Edit", L"", WS_CHILD | WS_VISIBLE | WS_BORDER | SS_CENTER, 157, 25, 200, 25, hwnd, (HMENU)USERNAME_WINDOW, NULL, NULL);
-			HWND hwndPasswordText = CreateWindow(L"static", L"Password", WS_CHILD | WS_VISIBLE, 50, 52, 100, 25, hwnd, NULL, NULL, NULL);
-			HWND hwndPasswordEntry = CreateWindow(L"Edit", L"", WS_CHILD | WS_VISIBLE | WS_BORDER | SS_CENTER, 157, 52, 200, 25, hwnd, (HMENU)PASSWORD_WINDOW, NULL, NULL);
-			HWND hwndSubmit = CreateWindow(L"Button", L"Submit", WS_VISIBLE | WS_CHILD, 157, 80, 100, 50, hwnd, (HMENU)SUBMIT_BUTTON, NULL, NULL);
+			CreateWindowW(L"static", L"Username", WS_CHILD | WS_VISIBLE, 50, 25, 100, 25, hwnd, NULL, NULL, NULL);
+			hwndUserNameEntry = CreateWindowW(L"Edit", L"", WS_CHILD | WS_VISIBLE | WS_BORDER | SS_CENTER, 157, 25, 200, 25, hwnd, (HMENU)USERNAME_WINDOW, NULL, NULL);
+			CreateWindowW(L"static", L"Password", WS_CHILD | WS_VISIBLE, 50, 52, 100, 25, hwnd, NULL, NULL, NULL);
+			hwndPasswordEntry = CreateWindowW(L"Edit", L"", WS_CHILD | WS_VISIBLE | WS_BORDER | SS_CENTER, 157, 52, 200, 25, hwnd, (HMENU)PASSWORD_WINDOW, NULL, NULL);
+			hwndSubmit = CreateWindowW(L"Button", L"Submit", WS_VISIBLE | WS_CHILD, 157, 80, 100, 50, hwnd, (HMENU)SUBMIT_BUTTON, NULL, NULL);
 			if (hwndSubmit == NULL) {
 				int result = GetLastError();
-				MessageBox(NULL, L"Failed to Password", L"ERROR", 0);
+				MessageBox(NULL, L"Failed to submit", L"ERROR", 0);
 			}
 			break;
+
+		case WM_COMMAND:
+			SQLWCHAR Username[30], Password[30];
+			switch (LOWORD(wParam))
+			{
+				case SUBMIT_BUTTON:
+					SQLWCHAR UsernameEntry = GetWindowText(hwndUserNameEntry, Username, 30);
+					SQLWCHAR PasswordEntry = GetWindowText(hwndPasswordEntry, Password, 30);
+					SQLMain(UsernameEntry, PasswordEntry);
+					break;
+			}
+			break;
+			return 0;
 	}
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }

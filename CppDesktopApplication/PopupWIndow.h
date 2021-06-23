@@ -5,8 +5,6 @@
 
 #include <Windows.h>
 
-//extern HWND hwndDialogWindow;
-
 void RegisterDialog(HINSTANCE);
 void DisplayRegisterDialog(HWND);
 void DisableMinimizeButton(HWND);

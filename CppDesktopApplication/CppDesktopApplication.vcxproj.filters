@@ -21,12 +21,18 @@
     <ClCompile Include="PopupWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SQLConnection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainApplication.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PopupWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLConnection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

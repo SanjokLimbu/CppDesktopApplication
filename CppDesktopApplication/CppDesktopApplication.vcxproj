@@ -141,10 +141,12 @@
   <ItemGroup>
     <ClCompile Include="MainApplication.cpp" />
     <ClCompile Include="PopupWindow.cpp" />
+    <ClCompile Include="SQLConnection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainApplication.h" />
     <ClInclude Include="PopupWindow.h" />
+    <ClInclude Include="SQLConnection.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

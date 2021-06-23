@@ -5,7 +5,7 @@
 
 struct StateInfo {  };
 BOOL WindowResize(HWND, WPARAM, LPARAM);
-HWND hwndMainWindow, hwndRegister, hwndLogin; //hwndDialogWindow;
+HWND hwndMainWindow, hwndRegister, hwndLogin;
 
 inline StateInfo* GetAppState(HWND hwnd)
 {

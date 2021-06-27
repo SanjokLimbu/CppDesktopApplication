@@ -36,7 +36,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		NULL,
 		NULL,
 		hInstance,
-		pstate
+		&pstate
 	);
 
 	if (hwndMainWindow == NULL) {

@@ -7,4 +7,4 @@
 //unsigned char szData[MAX_DATA]; //Returned data storage
 //SDWORD cbData;                  //Output length of data
 
-int SQLMain(SQLWCHAR, SQLWCHAR);
+int SQLMain(SQLVARCHAR, SQLVARCHAR);

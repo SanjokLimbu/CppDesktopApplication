@@ -1,3 +1,7 @@
+#ifndef UNICODE
+#define UNICODE
+#endif
+
 #include "PopupWindow.h"
 #include "SQLConnection.h"
 
@@ -72,8 +76,8 @@ LRESULT CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			switch (LOWORD(wParam))
 			{
 				case SUBMIT_BUTTON:
-					SQLWCHAR UsernameEntry = GetWindowText(hwndUserNameEntry, Username, 30);
-					SQLWCHAR PasswordEntry = GetWindowText(hwndPasswordEntry, Password, 30);
+					SQLVARCHAR UsernameEntry = GetWindowText(hwndUserNameEntry, Username, 30);
+					SQLVARCHAR PasswordEntry = GetWindowText(hwndPasswordEntry, Password, 30);
 					SQLMain(UsernameEntry, PasswordEntry);
 					break;
 			}

@@ -1,28 +1,34 @@
+#ifndef UNICODE
+#define UNICODE
+#endif
+
 #define MYSQLSUCCESS(returnCode) ((returnCode == SQL_SUCCESS) || (returnCode == SQL_SUCCESS_WITH_INFO))
 #define MAX_DATA 100
 
 #include "SQLConnection.h"
 #include <stdio.h>
+#include <iostream>
 
-RETCODE returnCode;    //ODBC return code
+RETCODE returnCode;       //ODBC return code
 SQLHENV handleEnvironment;//Environment handle
 SQLHDBC handleConnection; //Connection handle
 SQLHSTMT handleStatement; //Statement handle
+SQLHDESC handleDescriptor;//Descriptor handle
 
-//void ShowSqlError(unsigned int handleType, const SQLHANDLE& handle) {
-//	SQLWCHAR SQLState[1024];
-//	SQLWCHAR message[1024];
-//	if (SQL_SUCCESS == SQLGetDiagRec(handleType, handle, 1, SQLState, NULL, message, 1024, NULL)) {
-//		MessageBox(NULL, message, L"Error", 0);
-//	}
-//}
+void SQLDisconnect()
+{
+	SQLFreeStmt(handleStatement, SQL_DROP);
+	SQLDisconnect(handleConnection);
+	SQLFreeConnect(handleConnection);
+	SQLFreeEnv(handleEnvironment);
+}
 
 //Allocate environment handle and connection handle, connect to data source and
 void SQLConnection() 
 {
-	SQLWCHAR dataSourceName[] = L"DSN=SQLCPPTEST;UID=*;PWD=*;", returnConnectionString[1024], text[1024], SQLState[1024];
-	SQLINTEGER i = 0, native;
-	SQLSMALLINT len;
+	SQLWCHAR dataSourceName[] = L"DSN=SQLCPPTESTNATIVE;UID=sa;PWD=Illidian9", returnConnectionString[1024], text[1024], SQLState[1024];
+	SQLINTEGER native;
+	SQLSMALLINT i = 0, len;
 	SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &handleEnvironment);
 	SQLSetEnvAttr(handleEnvironment, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0);
 	SQLAllocHandle(SQL_HANDLE_DBC, handleEnvironment, &handleConnection);
@@ -44,54 +50,54 @@ void SQLConnection()
 	SQLAllocHandle(SQL_HANDLE_STMT, handleConnection, &handleStatement);
 }
 
-void SQLExecution(SQLWCHAR _username, SQLWCHAR _password)
+void SQLExecution(SQLVARCHAR _username, SQLVARCHAR _password)
 {
-	SQLWCHAR Username = _username;
-	SQLWCHAR Password = _password;
-	SQLINTEGER cbValue = SQL_NTS;
+	SQLVARCHAR Username = _username, Password = _password;
+	SQLWCHAR text[1024], SQLState[1024];
+	SQLINTEGER native, cbValue = SQL_NTS;
+	SQLSMALLINT i = 0, len;
 
-	//SQLPrepare(handleStatement, (SQLWCHAR*)"{call REGISTER_USER(?,?)}", SQL_NTS);
-	SQLBindParameter(handleStatement, 1, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_VARCHAR, 30, 0, &Username, 0, &cbValue);
-	SQLBindParameter(handleStatement, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_VARCHAR, 30, 0, &Password, 0, &cbValue);
-	//SQLWCHAR prepare = SQLPrepare(handleStatement, callProcedure, SQL_NTS);
+	SQLWCHAR queryRegisterUser[] = L"{call REGISTER_USER(?,?)}";
+
+	returnCode = SQLPrepare(handleStatement, queryRegisterUser, SQL_NTS);
 	if (!MYSQLSUCCESS(returnCode))
 	{
-		//ShowSqlError();
 		//Deallocate handles and disconnect
-		SQLFreeStmt(handleStatement, SQL_DROP);
-		SQLDisconnect(handleConnection);
-		SQLFreeConnect(handleConnection);
-		SQLFreeEnv(handleEnvironment);
+		SQLGetDiagRec(SQL_HANDLE_STMT, handleStatement, ++i, SQLState, &native, text - 1, sizeof(text), &len);
+		SQLDisconnect();
 	}
-	else {
-		returnCode = SQLExecute(handleStatement);
+
+	returnCode = SQLBindParameter(handleStatement, 1, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_VARCHAR, 30, 0, &Username, sizeof(Username), &cbValue);
+	if (!MYSQLSUCCESS(returnCode))
+	{
+		//Deallocate handles and disconnect
+		SQLGetDiagRec(SQL_HANDLE_STMT, handleStatement, ++i, SQLState, &native, text - 1, sizeof(text), &len);
+		SQLDisconnect();
+	}
+	//returnCode = SQLGetStmtAttr(handleStatement, SQL_ATTR_IMP_PARAM_DESC, &handleDescriptor, 0, 0);
+	//returnCode = SQLSetDescField(handleDescriptor, 1, SQL_DESC_NAME, "@Username", SQL_NTS);
+
+	returnCode = SQLBindParameter(handleStatement, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_VARCHAR, 30, 0, &Password, sizeof(Password), &cbValue);
+	if (!MYSQLSUCCESS(returnCode))
+	{
+		//Deallocate handles and disconnect
+		SQLGetDiagRec(SQL_HANDLE_STMT, handleStatement, ++i, SQLState, &native, text - 1, sizeof(text), &len);
+		SQLDisconnect();
+	}
+	returnCode = SQLExecute(handleStatement);
+	if (!MYSQLSUCCESS(returnCode))
+	{
+		//Deallocate handles and disconnect
+		SQLGetDiagRec(SQL_HANDLE_STMT, handleStatement, ++i, SQLState, &native, text - 1, sizeof(text), &len);
+		SQLDisconnect();
 	}
 }
 
-void SQLDisconnect() 
+int SQLMain(SQLVARCHAR Username, SQLVARCHAR Password)
 {
-	SQLFreeStmt(handleStatement, SQL_DROP);
-	SQLDisconnect(handleConnection);
-	SQLFreeConnect(handleConnection);
-	SQLFreeEnv(handleEnvironment);
-}
-
-//void ShowSqlError() {
-//	SQLWCHAR szSQLSTATE[10];
-//	SDWORD nErr;
-//	SQLWCHAR msg[SQL_MAX_MESSAGE_LENGTH + 1];
-//	SWORD cbmsg;
-//
-//	while (SQLError(0, 0, handleStatement, szSQLSTATE, &nErr, msg, sizeof(msg), &cbmsg) == SQL_SUCCESS) {
-//		sprintf_s((char*)szData, sizeof(szData), "Error:\nSQLSTATE=%s, Native error=%ld, msg='%s'", szSQLSTATE, nErr, msg);
-//		MessageBox(NULL, (const wchar_t*)szData, L"ODBC Error", MB_OK);
-//	}
-//}
-
-int SQLMain(SQLWCHAR Username, SQLWCHAR Password) {
 	SQLConnection();
 	SQLExecution(Username, Password);
 	SQLDisconnect();
-
-	return 1;
+	MessageBox(NULL, L"Please close the message box and Login to continue.", L"Registration Successful", MB_OK);
+	return 0;
 }
